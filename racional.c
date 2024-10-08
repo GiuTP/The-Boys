@@ -119,25 +119,31 @@ void imprime_r (struct racional r)
 
 int compara_r (struct racional r1, struct racional r2)
 {
+  long num1, num2;
   long div_com;
 
   if (!valido_r(r1) || !valido_r(r2))
     return -2;
 
+  r1 = simplifica_r(r1);
+  r2 = simplifica_r(r2);
+
+  num1= r1.num;
+  num2= r2.num;
   if (r1.den != r2.den)
   {
     div_com = mmc(r1.den, r2.den);
-    r1.num = div_com/r1.den * r1.num;
-    r2.num = div_com/r2.den * r2.num;
+    num1 = div_com / r1.den * r1.num;
+    num2 = div_com / r2.den * r2.num;
   }
 
-  if (r1.num < r2.num)
+  if (num1 < num2)
     return -1;
   
-  if (r1.num > r2.num)
-    return 1;
+  if (num1 == num2)
+    return 0;
 
-  return 0;
+  return 1;
 }
 
 int soma_r (struct racional r1, struct racional r2, struct racional *r3)

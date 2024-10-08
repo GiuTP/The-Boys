@@ -39,48 +39,41 @@ void imprimi_v (struct racional v[], int n)
 void elimina_NaN (struct racional *v, int *n)
 {
   int i;
-  int j = 0;
   
   for (i = 0; i < *n; i++)
   {
-    if (v[i].den != 0)
+    if (v[i].den == 0)
     {
-      v[j++] = v[i];
+      v[i] = v[*n];
+      (*n)--;
+      i--;
     }
   }
-
-  *n = j;
 }
 
 void ordenar_v (struct racional *v, int n)
 {
   int i, j;
   struct racional temp;
-  for (i = 1; i < n; i++)
+
+  for (i = 0; i < n; i++)
   {
-    temp = v[i];
-
-    for (j = i - 1; j >= 0 && compara_r(v[j], temp) == 1; j--)
-        v[j+1] = v[j];
-
-    v[j+1] = temp;
+    for (j = 0; j < n - i -1; j++)
+    {
+      if (compara_r(v[j], v[j+1]) == 1)
+      {
+        temp = v[j];
+        v[j] = v[j+1];
+        v[j+1] = temp;
+      }
+    }
   }
 }
-
-void soma_v (struct racional v[], int n)
-{
-  for (int i = 0; i < n; i++)
-  {
-    
-  }
-}
-
 
 int main ()
 {
   struct racional v[TAM];
   int n;
-  struct racional sum;
 
   do
     scanf("%d", &n);
@@ -95,11 +88,6 @@ int main ()
   ordenar_v(v, n);
   imprimi_v(v, n);
 
-  printf("VETOR = ");
-  for (int i = 0; i < n-1; i++)
-    if (soma_r(v[i], v[i+1], &sum));
-
-  imprime_r(sum);
   printf("\n");
 
   return 0;
