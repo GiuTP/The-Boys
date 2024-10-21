@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "racional.h"
+#include "utils.h"
 
 void ler_v (struct racional **v, int n)
 {
@@ -69,8 +70,8 @@ int soma_v (struct racional **v, int n, struct racional **sum)
 
     if (!(*sum = malloc(sizeof(struct racional))))
         return 0;
-    
-    /* Inicializa o acumulador */
+
+    /* Inicializar o acumulador */
     (*sum)->num = 0;
     (*sum)->den = 1;
 
@@ -78,9 +79,12 @@ int soma_v (struct racional **v, int n, struct racional **sum)
     for (i = 0; i < n; i++)
     {
         if (!valido_r(v[i]))
+        {
+            free(*sum);
+            *sum = NULL;
             return 0;
+        }
         
-
         soma_r(*sum, v[i], *sum);
     }
     
