@@ -1,7 +1,3 @@
-// TAD Fila de prioridades (FPRIO) genérica
-// Carlos Maziero, DINF/UFPR, Out 2024
-// Implementação com lista encadeada simples
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "fprio.h"
@@ -13,6 +9,7 @@ struct fprio_t *fprio_cria ()
     if (!(f = malloc(sizeof(struct fprio_t))))
         return NULL;
 
+    /* Lista não aponta para nenhum nodo na sua criação e possui tamanho 0 */
     f->prim = NULL;
     f->num = 0;
 
@@ -29,8 +26,9 @@ struct fprio_t *fprio_destroi (struct fprio_t *f)
     while (f->prim != NULL)
     {
         aux = f->prim;
-        f->prim = aux->prox; 
-
+        f->prim = aux->prox;
+    
+        free(aux->item); /* libera o item do nodo */
         free(aux); /* libera o nodo */
     }
 
@@ -43,17 +41,29 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 {
     struct fpnodo_t *aux, *novo;
 
+    /* Verifica se fila ou item são ponteiros nulos */
     if (f == NULL || item == NULL)
         return -1;
-
 
     if (!(novo = malloc(sizeof(struct fpnodo_t))))
         return -1;
 
+    /* Novo nodo recebe os parâmetros a serem incluídos */
     novo->item = item;
     novo->tipo = tipo;
     novo->prio = prio;
 
+    /* Verifica se o item já existe na fila */
+    aux = f->prim;
+    while (aux != NULL)
+    {
+        if ((aux->item == item) && (aux->tipo == tipo) && (aux->prio == prio))
+            return -1;
+
+        aux = aux->prox;
+    }
+
+    /* Insere em fila vazia */
     if (f->num == 0)
     {
         f->prim = novo;
@@ -65,28 +75,23 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
 
     aux = f->prim;
 
-    if (prio <= aux->prio)
+    /* Caso onde a prioridade do novo nodo é maior que o primeiro nodo da fila */
+    if (prio < aux->prio)
     {
         novo->prox = aux;
         f->prim = novo;
-        if (aux->item == item && aux->prio == prio && aux->tipo == tipo)
-            return -1;
-
         f->num++;
+
         return f->num;
     }
 
+    /* Caso geral, tenta inserir pelo meio */
     while (aux->prox != NULL && prio >= aux->prox->prio)
-    {
-        if (aux->item == item && aux->prio == prio && aux->tipo == tipo)
-            return -1;
         aux = aux->prox;
-    }
 
     novo->prox = aux->prox;
     aux->prox = novo;
     f->num++;
-
 
     return f->num;    
 }
@@ -95,18 +100,17 @@ void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
 {
     struct fpnodo_t *aux;
     void *item;
+
+    /* Verifica se nenhum ponteiro é nulo */
     if (f == NULL || f->prim == NULL || tipo == NULL || prio == NULL)
         return NULL;
 
+    /* Retira conforme política FIFO */
     aux = f->prim;
-    
-    if (f->num == 1)
-        f->prim = NULL;
-    else
-        f->prim = aux->prox;
 
-    *tipo = aux->tipo;
-    *prio = aux->prio;
+    f->prim = aux->prox;
+    *tipo = aux->tipo; /* devolve o tipo do item retirado */
+    *prio = aux->prio; /* devolve a prioridade do item retirado */
     item = aux->item;
 
     free(aux);
@@ -128,6 +132,7 @@ void fprio_imprime (struct fprio_t *f)
     struct fpnodo_t *aux;
     int i;
 
+    /* Se fila for vazia ou nula, não imprime nada */
     if (f == NULL || f->num == 0)
         return;
 
