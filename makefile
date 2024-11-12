@@ -1,22 +1,48 @@
-# Makefile de exemplo (Manual do GNU Make)
+# makefile The Boys
+# Carlos Maziero - DINF/UFPR, 2024/2
 
-CFLAGS = -Wall -Wextra -g -std=c99 # flags de compilacao
-CC = gcc
+CC      = gcc
+CFLAGS  = -Wall -Wextra -Werror -g -std=c99
+LDLIBS  = -lm
+MAIN    = theboys
+ENTREGA = $(MAIN)
 
-all: tp1
+# lista de arquivos de cabeçalho (a completar)
+HDR = entidades.h
 
-# gera o executável
-tp1: tp1.o racional.o
-	$(CC) -o tp1 tp1.o racional.o
+# lista de arquivos-objeto (a completar)
+# não inclua conjunto.o, senão ele será removido com "make clean"
+OBJ = theboys.o
 
-# compila racional.c
-racional.o: racional.c racional.h
-	$(CC) -c $(CFLAGS) racional.c
+# construir o executável
+$(MAIN): $(MAIN).o $(OBJ) conjunto.o
 
-# compila tp1.c
-tp1.o: tp1.c racional.h
-	$(CC) -c $(CFLAGS) tp1.c
+# construir os arquivos-objeto (a completar)
+$(MAIN).o: $(MAIN).c $(HDR)
 
+# construir os TADs
+lista.o: lista.c lista.h
+fprio.o: fprio.c fprio.h
+eventos.o: eventos.c eventos.h conjunto.h fprio.h lista.h entidades.h
+
+# executar
+run: $(MAIN)
+	./$(MAIN)
+
+# testar no Valgrind
+valgrind: $(MAIN)
+	valgrind --leak-check=full --track-origins=yes ./$(MAIN)
+
+# gerar arquivo TGZ para entregar
+tgz: clean
+	-mkdir -p /tmp/$(USER)/$(ENTREGA)
+	chmod 0700 /tmp/$(USER)/$(ENTREGA)
+	cp *.c *.h makefile /tmp/$(USER)/$(ENTREGA)
+	tar czvf $(ENTREGA).tgz -C /tmp/$(USER) $(ENTREGA)
+	rm -rf /tmp/$(USER)
+	@echo "Arquivo $(ENTREGA).tgz criado para entrega"
+
+# limpar arquivos temporários
 clean:
-	rm -f *.o *~ tp1
+	rm -f *~ $(OBJ) $(MAIN) /tmp/$(USER)/$(ENTREGA) $(ENTREGA).tgz
 
