@@ -4,22 +4,22 @@
 #include <stdlib.h>
 #include "lista.h"
 
-struct lista_t *lista_cria ()
+struct lista_t *lista_cria()
 {
     struct lista_t *lst;
 
     if (!(lst = malloc(sizeof(struct lista_t))))
         return NULL;
-    
+
     /* Lista não aponta para nenhum nodo na sua criação e possui tamanho 0 */
     lst->prim = NULL;
     lst->ult = NULL;
     lst->tamanho = 0;
 
-    return lst; 
+    return lst;
 }
 
-struct lista_t *lista_destroi (struct lista_t *lst)
+struct lista_t *lista_destroi(struct lista_t *lst)
 {
     struct item_t *aux;
 
@@ -30,159 +30,88 @@ struct lista_t *lista_destroi (struct lista_t *lst)
         free(aux);
     }
 
-    free (lst);
+    free(lst);
 
     return NULL;
 }
 
-int lista_insere (struct lista_t *lst, int item, int pos)
+/* Adaptado para fila (FIFO) */
+int lista_insere(struct lista_t *lst, int item, int pos)
 {
-    struct item_t *aux, *novo;
-    int i;
+    struct item_t *novo;
 
-    /* Verifica se lista nula ou posição inválida para inserção */
-    if (lst == NULL || pos < -1)
+    /* Caso de lista nula */
+    if (lst == NULL)
         return -1;
-    
+
+    /* Aloca memória para novo nodo */
     if (!(novo = malloc(sizeof(struct item_t))))
         return -1;
-    
-    /* Novo nodo recebe o item a ser incluído na posição pos */
+
+    /* Novo nodo recebe o item a ser incluído na fila */
     novo->valor = item;
 
-    /* Inserção em lista vazia (tamanho 0) */
+    /* Inserção em lista vazia */
     if (lst->tamanho == 0)
     {
         lst->prim = novo;
         lst->ult = novo;
         novo->ant = NULL;
         novo->prox = NULL;
-
-        lst->tamanho++;
-
-        return lst->tamanho;
     }
 
-    /* Inserção na última posição da lista */
+    /* Inserção na fila (última posição) */
     if (pos == -1)
     {
         lst->ult->prox = novo;
         novo->ant = lst->ult;
         novo->prox = NULL;
         lst->ult = novo;
-
-        lst->tamanho++;
-
-        return lst->tamanho;
     }
 
-    /* Inserção na primeira posição da lista */
-    if (pos == 0)
-    {
-        lst->prim->ant = novo;
-        novo->ant = NULL;
-        novo->prox = lst->prim;
-        lst->prim = novo;
-
-        lst->tamanho++;
-
-        return lst->tamanho;
-    }
-
-    /* Inserção no meio da lista na posição pos */
-    aux = lst->prim;
-    for (i = 0; i < pos - 1; i++)
-        aux = aux->prox;
-    
-    novo->prox = aux->prox;
-    novo->ant = aux;
-    aux->prox->ant = novo;
-    aux->prox = novo;
-
-    lst->tamanho++;
+    lst->tamanho++; /* Incrementa o tamanho da lista */
 
     return lst->tamanho;
 }
 
-int lista_retira (struct lista_t *lst, int *item, int pos)
+/* Adaptado para fila (FIFO) */
+int lista_retira(struct lista_t *lst, int *item, int pos)
 {
     struct item_t *aux;
-    int i;
 
-    /* Casos de lista nula ou posição inválida de retirada */
-    if (lst == NULL || pos < -1 || pos >= lst->tamanho)
+    /* Caso de lista nula */
+    if (lst == NULL)
         return -1;
 
-    /* Remoção de lista de tamanho 1 */
-    if (lst->tamanho == 1)
+    /* Politica FIFO */
+    if (pos >= 0)
     {
-        aux = lst->prim;
-        *item = aux->valor;
+        aux = lst->prim;    /* Aux recebe o primeiro nodo da fila */
+        *item = aux->valor; /* Item recebe o valor do primeiro nodo */
 
-        lst->prim = NULL;
-        lst->ult = NULL;
-
-        free(aux);
-        lst->tamanho--;
-
-        return lst->tamanho;
+        lst->prim = aux->prox; /* Ponteiro de primeiro aponta para o segundo da fila */
+        if (lst->prim != NULL)
+            lst->prim->ant = NULL; /* Ponteiro de anterior do segundo (novo 1) aponta para NULL */
+        else
+            lst->ult = NULL; /* Ponteiro de ultimo aponta para NULL */
     }
-
-    /* Remoção da última posição da lista */
-    if (pos == -1)
-    {
-        aux = lst->ult;
-        *item = aux->valor;
-
-        lst->ult = aux->ant;
-        lst->ult->prox = NULL;
-
-        free(aux);
-        lst->tamanho--;
-
-        return lst->tamanho;
-    }
-
-    /* Remoção da primeira posição da lista */
-    if (pos == 0)
-    {
-        aux = lst->prim;
-        *item = aux->valor;
-
-        lst->prim = aux->prox;
-        lst->prim->ant = NULL;
-
-        free(aux);
-        lst->tamanho--;
-
-        return lst->tamanho;
-    }
-
-    /* Remoção no meio da lista na posição pos */
-    aux = lst->prim;
-    for(i = 0; i < pos; i++)
-        aux = aux->prox;
-    
-    *item = aux->valor;
-    aux->ant->prox = aux->prox;
-    aux->prox->ant = aux->ant;
 
     free(aux);
     lst->tamanho--;
-    
+
     return lst->tamanho;
 }
 
-int lista_consulta (struct lista_t *lst, int *item, int pos)
+int lista_consulta(struct lista_t *lst, int *item, int pos)
 {
     struct item_t *aux;
     int i;
 
-    /* Casos de lista nula ou posição inválida para consulta */
+    /* Casos de fila nula ou posição inválida para consulta */
     if (lst == NULL || pos < -1 || pos >= lst->tamanho)
         return -1;
-    
-    /* Consulta na última posição da lista */
+
+    /* Consulta na última posição da fila */
     if (pos == -1)
     {
         *item = lst->ult->valor;
@@ -190,39 +119,39 @@ int lista_consulta (struct lista_t *lst, int *item, int pos)
         return lst->tamanho;
     }
 
-    /* Consulta em uma posição qualquer da lista */
+    /* Consulta em uma posição qualquer da fila */
     aux = lst->prim;
     for (i = 0; i < pos; i++)
         aux = aux->prox;
-    
+
     *item = aux->valor;
 
     return lst->tamanho;
 }
 
-int lista_procura (struct lista_t *lst, int valor)
+int lista_procura(struct lista_t *lst, int valor)
 {
     struct item_t *aux;
     int pos;
 
-    /* Caso de lista nula */
+    /* Caso de fila nula */
     if (lst == NULL)
         return -1;
 
     /* Loop acaba por dois motivos:
-        * Ou o valor desejado foi encontrado;
-        * Ou o pos chegou até o fim e não achou o valor. */
+     * Ou o valor desejado foi encontrado;
+     * Ou o pos chegou até o fim e não achou o valor. */
     aux = lst->prim;
-    for(pos = 0; pos < lst->tamanho && aux->valor != valor; pos++)
+    for (pos = 0; pos < lst->tamanho && aux->valor != valor; pos++)
         aux = aux->prox;
-    
+
     if (pos == lst->tamanho)
         return -1;
 
     return pos;
 }
 
-int lista_tamanho (struct lista_t *lst)
+int lista_tamanho(struct lista_t *lst)
 {
     if (lst == NULL)
         return -1;
@@ -230,12 +159,12 @@ int lista_tamanho (struct lista_t *lst)
     return lst->tamanho;
 }
 
-void lista_imprime (struct lista_t *lst)
+void lista_imprime(struct lista_t *lst)
 {
     struct item_t *aux;
     int i;
 
-    /* Se a lista for nula ou de tamanho 0 não imprime nenhum valor */
+    /* Se a fila for nula ou de tamanho 0 não imprime nenhum valor */
     if (lst == NULL || lst->tamanho == 0)
         return;
 
@@ -243,7 +172,7 @@ void lista_imprime (struct lista_t *lst)
     for (i = 0; i < lst->tamanho; i++)
     {
         printf("%d", aux->valor);
-        if(i < lst->tamanho - 1)
+        if (i < lst->tamanho - 1)
             printf(" ");
 
         aux = aux->prox;

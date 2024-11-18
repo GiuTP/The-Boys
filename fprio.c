@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include "fprio.h"
 
-struct fprio_t *fprio_cria ()
+struct fprio_t *fprio_cria()
 {
     struct fprio_t *f;
-    
+
     if (!(f = malloc(sizeof(struct fprio_t))))
         return NULL;
 
@@ -16,7 +16,7 @@ struct fprio_t *fprio_cria ()
     return f;
 }
 
-struct fprio_t *fprio_destroi (struct fprio_t *f)
+struct fprio_t *fprio_destroi(struct fprio_t *f)
 {
     struct fpnodo_t *aux;
 
@@ -27,9 +27,9 @@ struct fprio_t *fprio_destroi (struct fprio_t *f)
     {
         aux = f->prim;
         f->prim = aux->prox;
-    
+
         free(aux->item); /* libera o item do nodo */
-        free(aux); /* libera o nodo */
+        free(aux);       /* libera o nodo */
     }
 
     free(f); /* libera a fila */
@@ -37,7 +37,7 @@ struct fprio_t *fprio_destroi (struct fprio_t *f)
     return NULL;
 }
 
-int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
+int fprio_insere(struct fprio_t *f, void *item, int tipo, int prio)
 {
     struct fpnodo_t *aux, *novo;
 
@@ -96,10 +96,10 @@ int fprio_insere (struct fprio_t *f, void *item, int tipo, int prio)
     aux->prox = novo;
     f->num++;
 
-    return f->num;    
+    return f->num;
 }
 
-void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
+void *fprio_retira(struct fprio_t *f, int *tipo, int *prio)
 {
     struct fpnodo_t *aux;
     void *item;
@@ -122,15 +122,15 @@ void *fprio_retira (struct fprio_t *f, int *tipo, int *prio)
     return item;
 }
 
-int fprio_tamanho (struct fprio_t *f)
+int fprio_tamanho(struct fprio_t *f)
 {
     if (f == NULL)
         return -1;
-    
+
     return f->num;
 }
 
-void fprio_imprime (struct fprio_t *f)
+void fprio_imprime(struct fprio_t *f)
 {
     struct fpnodo_t *aux;
     int i;
@@ -144,7 +144,7 @@ void fprio_imprime (struct fprio_t *f)
     {
         printf("(%d %d)", aux->tipo, aux->prio);
         if (i < f->num - 1)
-        printf(" ");
+            printf(" ");
 
         aux = aux->prox;
     }
