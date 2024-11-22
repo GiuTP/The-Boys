@@ -6,7 +6,7 @@
 
 /* -------------------- Entidades do mundo -------------------- */
 
-/* Heroi */
+/* Descreve atributos de um heroi */
 struct hero
 {
     int ID;                /* identicador do heroi */
@@ -25,7 +25,7 @@ struct coord
     int y;
 };
 
-/* Bases */
+/* Descreve atributos de uma base */
 struct base
 {
     int ID;                        /* identicador da base */
@@ -35,7 +35,7 @@ struct base
     struct coord locatization;     /* localizacao da base */
 };
 
-/* Missao */
+/* Descreve atributos de uma missao */
 struct mission
 {
     int ID;                      /* identicador da missao */
@@ -44,7 +44,7 @@ struct mission
     struct coord localization;   /* localizacao da missao */
 };
 
-/* Mundo */
+/* Descreve atributos de um mundo */
 struct world
 {
     int total_heroes;        /* numero de herois no mundo */
@@ -58,7 +58,7 @@ struct world
     int clock;               /* tempo do mundo */
 };
 
-/* Eventos */
+/* Descreve atributos vinculados a um evento */
 struct event
 {
     int tipo;
@@ -69,6 +69,7 @@ struct event
 
 /* -------------------- Inicializacao do mundo -------------------- */
 
+/* Retorna um novo aleatorio entre min e max */
 long aleat(long min, long max);
 
 /* Inicializa os campos basicos do mundo */

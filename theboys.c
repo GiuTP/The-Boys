@@ -12,7 +12,7 @@
 #include "entidades.h"
 
 // seus #defines vão aqui
-#define T_FIM_DO_MUNDO 20000 /* 525600 */
+#define T_FIM_DO_MUNDO 8000 /* 525600 */
 typedef enum
 {
     CHEGA = 1,
@@ -67,6 +67,15 @@ int main()
             break;
         case AVISA:
             evento_avisa(&lef, &my_world, ev);
+            break;
+        case ENTRA:
+            evento_entra(&lef, &my_world, ev);
+            break;
+        case SAI:
+            evento_sai(&lef, &my_world, ev);
+            break;
+        case FIM:
+            printf("Fim do mundo\n");
             break;
         }
         free(ev);
