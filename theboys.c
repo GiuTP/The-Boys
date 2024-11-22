@@ -4,6 +4,7 @@
 // seus #includes vão aqui
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "lista.h"
 #include "fprio.h"
 #include "conjunto.h"
@@ -11,55 +12,72 @@
 #include "entidades.h"
 
 // seus #defines vão aqui
-#define T_INICIO 0
-#define T_FIM_DO_MUNDO 525600
-#define N_TAMANHO_MUNDO 20000
-#define N_HABILIDADES 10
-#define CHEGA 1
-#define ESPERA 2
-#define DESISTE 3
-#define AVISA 4
-#define ENTRA 5
-#define SAI 6
-#define VIAJA 7
-#define MORRE 8
-#define MISSAO 9
-#define FIM 10
+#define T_FIM_DO_MUNDO 20000 /* 525600 */
+typedef enum
+{
+    CHEGA = 1,
+    ESPERA,
+    DESISTE,
+    AVISA,
+    ENTRA,
+    SAI,
+    VIAJA,
+    MORRE,
+    MISSAO,
+    FIM
+} EventType;
 
 // minimize o uso de variáveis globais
 
 // programa principal
 int main()
 {
-    /* Variaveis usadas */
     struct world my_world;
+    struct event *ev;
     struct fprio_t *lef;
+    int tipo, tempo;
 
-    my_world.clock = T_INICIO;
-    my_world.size_world.x = my_world.size_world.y = N_TAMANHO_MUNDO;
-    my_world.total_skills = N_HABILIDADES;
-    my_world.total_heroes = N_HABILIDADES * 5;
-    my_world.total_heroes = my_world.total_heroes / 5;
-    my_world.total_missions = T_FIM_DO_MUNDO / 100;
+    my_world = mundo_inicia();
+    my_world.heroes = herois_inicia(&my_world);
+    my_world.bases = bases_inicia(&my_world);
+
+    lef = fprio_cria();
+
+    heroes_evi(&lef, &my_world);
+    end_evi(&lef);
 
     /* Semente randômica */
     srand(0);
 
-    /* ------- Inicializa o mundo ------- */
+    do
+    {
+        ev = fprio_retira(lef, &tipo, &tempo);
+        my_world.clock = tempo;
 
-    /* ------- Inicializa a LEF ------- */
+        switch (tipo)
+        {
+        case CHEGA:
+            evento_chega(&lef, &my_world, ev);
+            break;
+        case ESPERA:
+            evento_espera(&lef, &my_world, ev);
+            break;
+        case DESISTE:
+            evento_desiste(&lef, &my_world, ev);
+            break;
+        case AVISA:
+            evento_avisa(&lef, &my_world, ev);
+            break;
+        }
+        free(ev);
+        ev = NULL;
 
-    /* ------- Inicializa os eventos inicias ------- */
-    /* herois */
-
-    /* missoes */
-
-    /* fim do mundo */
-
-    // executar o laço de simulação
+    } while (tipo != FIM);
 
     /* libera a memoria alocada */
     // destruir o mundo
+    mundo_destroi(&my_world);
+    fprio_destroi(lef);
 
     return 0;
 }

@@ -4,7 +4,9 @@
 #include "conjunto.h"
 #include "lista.h"
 
-/* Estrutura de um heroi */
+/* -------------------- Entidades do mundo -------------------- */
+
+/* Heroi */
 struct hero
 {
     int ID;                /* identicador do heroi */
@@ -23,7 +25,7 @@ struct coord
     int y;
 };
 
-/* Estrutura de uma base */
+/* Bases */
 struct base
 {
     int ID;                        /* identicador da base */
@@ -33,7 +35,7 @@ struct base
     struct coord locatization;     /* localizacao da base */
 };
 
-/* Estrutura de uma missao */
+/* Missao */
 struct mission
 {
     int ID;                      /* identicador da missao */
@@ -42,7 +44,7 @@ struct mission
     struct coord localization;   /* localizacao da missao */
 };
 
-/* Estrutura de um mundo */
+/* Mundo */
 struct world
 {
     int total_heroes;        /* numero de herois no mundo */
@@ -56,13 +58,40 @@ struct world
     int clock;               /* tempo do mundo */
 };
 
+/* Eventos */
 struct event
 {
-    int tipo;       /* tipo do evento [1..10] */
-    int tempo;      /* instante que o evento ocorre */
-    int base;       /* base envolvida no evento */
-    struct hero *h; /* heroi envolvido no evento */
-    int tpb;
+    int tipo;
+    int tempo;
+    int hero_id;
+    int base_id;
 };
+
+/* -------------------- Inicializacao do mundo -------------------- */
+
+long aleat(long min, long max);
+
+/* Inicializa os campos basicos do mundo */
+/* Retorno: uma struct world */
+struct world mundo_inicia();
+
+/* Inicializa o vetor de herois do mundo. */
+/* Retorno: ponteiro para struct hero ou NULL em caso de erro */
+struct hero *herois_inicia(struct world *my_world);
+
+/* Inicializa o vetor de bases do mundo. */
+/* Retorno: ponteiro para struct base ou NULL em caso de erro */
+struct base *bases_inicia(struct world *my_world);
+
+/* ----------------- Inicializacao dos eventos iniciais ----------------- */
+
+void heroes_evi(struct fprio_t **lef, struct world *my_world);
+
+void end_evi(struct fprio_t **lef);
+
+/* -------------------- Destroi o mundo -------------------- */
+
+/* Destroi os elementos dinamicos do mundo, liberando a memoria alocada para cada um. */
+void mundo_destroi(struct world *my_world);
 
 #endif
