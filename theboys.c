@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "lista.h"
 #include "fprio.h"
 #include "conjunto.h"
@@ -40,10 +41,12 @@ int main()
     my_world = mundo_inicia();
     my_world.heroes = herois_inicia(&my_world);
     my_world.bases = bases_inicia(&my_world);
+    my_world.missions = missoes_inicia(&my_world);
 
     lef = fprio_cria();
 
     heroes_evi(&lef, &my_world);
+    mission_evi(&lef, &my_world);
     end_evi(&lef);
 
     /* Semente randômica */
@@ -73,6 +76,15 @@ int main()
             break;
         case SAI:
             evento_sai(&lef, &my_world, ev);
+            break;
+        case VIAJA:
+            evento_viaja(&lef, &my_world, ev);
+            break;
+        case MORRE:
+            evento_morre(&lef, &my_world, ev);
+            break;
+        case MISSAO:
+            evento_missao(&lef, &my_world, ev);
             break;
         case FIM:
             printf("Fim do mundo\n");

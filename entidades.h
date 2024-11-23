@@ -38,24 +38,24 @@ struct base
 /* Descreve atributos de uma missao */
 struct mission
 {
-    int ID;                      /* identicador da missao */
-    struct cjto_t skills_needed; /* conjunto de habilidades necessarias */
-    int danger;                  /* nivel de perigo da missao */
-    struct coord localization;   /* localizacao da missao */
+    int ID;                       /* identicador da missao */
+    struct cjto_t *skills_needed; /* conjunto de habilidades necessarias */
+    int danger;                   /* nivel de perigo da missao */
+    struct coord localization;    /* localizacao da missao */
 };
 
 /* Descreve atributos de um mundo */
 struct world
 {
-    int total_heroes;        /* numero de herois no mundo */
-    struct hero *heroes;     /* vetor de herois */
-    int total_bases;         /* numero de bases no mundo */
-    struct base *bases;      /* vetor de bases */
-    int total_missions;      /* numero de missoes no mundo */
-    struct mission missions; /* vetor de missoes */
-    int total_skills;        /* numero de habilidades distintas no mundo */
-    struct coord size_world; /* tamanho do mundo */
-    int clock;               /* tempo do mundo */
+    int total_heroes;         /* numero de herois no mundo */
+    struct hero *heroes;      /* vetor de herois */
+    int total_bases;          /* numero de bases no mundo */
+    struct base *bases;       /* vetor de bases */
+    int total_missions;       /* numero de missoes no mundo */
+    struct mission *missions; /* vetor de missoes */
+    int total_skills;         /* numero de habilidades distintas no mundo */
+    struct coord size_world;  /* tamanho do mundo */
+    int clock;                /* tempo do mundo */
 };
 
 /* Descreve atributos vinculados a um evento */
@@ -65,6 +65,23 @@ struct event
     int tempo;
     int hero_id;
     int base_id;
+    int mission_id;
+};
+
+struct bases_m
+{
+    int base_id;
+    int dist;
+    struct cjto_t *heroes_id;
+    struct cjto_t *Union;
+};
+
+struct statistics
+{
+    /* Estatisticas relacionadas as bases */
+    int max_pres_h;       /* Qtd. maxima de herois na base */
+    int max_queue;        /* Qtd. maxima de herois na fila da base */
+    int complete_mission; /* Qtd. de missoes que a base participou */
 };
 
 /* -------------------- Inicializacao do mundo -------------------- */
@@ -84,10 +101,21 @@ struct hero *herois_inicia(struct world *my_world);
 /* Retorno: ponteiro para struct base ou NULL em caso de erro */
 struct base *bases_inicia(struct world *my_world);
 
+/* Inicializa o vetor de missoes do mundo. */
+/* Retorno: ponteiro para struct mission ou NULL em caso de erro. */
+struct mission *missoes_inicia(struct world *my_world);
+
 /* ----------------- Inicializacao dos eventos iniciais ----------------- */
 
+/* Inicializa os eventos CHEGA iniciais de cada heroi do mundo. */
+/* Cria e adiciona na LEF o evento CHEGA para cada hero. */
 void heroes_evi(struct fprio_t **lef, struct world *my_world);
 
+/* Inicializa todas as missoes do mundo em um tempo aleatorio t. */
+/* Cria e adiciona na LEF o evento MISSAO para cada ID de missao. */
+void mission_evi(struct fprio_t **lef, struct world *my_world);
+
+/* Cria e adiciona na LEF o evento FIM (fim do mundo) */
 void end_evi(struct fprio_t **lef);
 
 /* -------------------- Destroi o mundo -------------------- */

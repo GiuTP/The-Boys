@@ -9,9 +9,10 @@
  * - Instante de tempo t (minutos) o qual o evento ocorrera;
  * - Tipo do evento inserido, variando de 1 a 10;
  * - Heroi vinculado ao evento, se for -1 nenhum heroi está vinculado;
- * - Base vinculada ao evento, se for -1 nenhuma base está vinculada; */
+ * - Base vinculada ao evento, se for -1 nenhuma base está vinculada;
+ * - Missao vinculada ao evento, se for -1 nenhuma missao está vinculada; */
 /* Retorna: ponteiro para uma struct event ou NULL em caso de erro. */
-struct event *cria_evento(int t, int type, int h, int b);
+struct event *cria_evento(int t, int type, int h, int b, int m);
 
 /* Evento o qual o heroi h chega em uma base b. */
 /* O evento vincula o heroi h a nova base b. */
@@ -52,5 +53,19 @@ void evento_entra(struct fprio_t **lef, struct world *my_world, struct event *ev
 /* Cria e adiciona na LEF os eventos VIAJA e AVISA. */
 /* Imprime o instante t que o heroi h sai da base b passando a ter x herois com capacidade para c herois. */
 void evento_sai(struct fprio_t **lef, struct world *my_world, struct event *ev);
+
+/* Evento o qual o heroi h viaja para a nova base d. */
+/* O evento calcula a distancia entre as bases e o tempo que essa viagem durara. */
+/* Cria e adiciona na LEF o evento CHEGA. */
+/* Imprime o instante t que o heroi h vai da base b a base d, com distancia dist e velocidade de h. Ele chega novo instante t. */
+void evento_viaja(struct fprio_t **lef, struct world *my_world, struct event *ev);
+
+/* Evento o qual o heroi morre. */
+/* O evento muda o status do heroi h para morto (status 0). */
+/* Cria e adiciona na LEF o evento AVISA. */
+/* Imprime o instante t que o heroi h morre na missao m. */
+void evento_morre(struct fprio_t **lef, struct world *my_world, struct event *ev);
+
+void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *ev);
 
 #endif
