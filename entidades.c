@@ -1,5 +1,4 @@
 // seus #includes vão aqui
-#include <stdio.h>
 #include <stdlib.h>
 #include "fprio.h"
 #include "entidades.h"

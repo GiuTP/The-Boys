@@ -2,13 +2,8 @@
 // Autor: Giuliano Thiago Pinherio Tavares, GRR 20240305
 
 // seus #includes vão aqui
-#include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include "lista.h"
 #include "fprio.h"
-#include "conjunto.h"
 #include "eventos.h"
 #include "entidades.h"
 

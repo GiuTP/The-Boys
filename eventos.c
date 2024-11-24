@@ -5,7 +5,6 @@
 #include "fprio.h"
 #include "lista.h"
 #include "entidades.h"
-#include "eventos.h"
 
 #define N_HABILIDADES 3 /* 10 */
 typedef enum
