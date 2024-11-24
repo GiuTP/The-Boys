@@ -8,9 +8,9 @@
 
 // seus #defines vão aqui
 #define T_INICIO 0
-#define T_FIM_DO_MUNDO 5000  /* 525600 */
-#define N_TAMANHO_MUNDO 8000 /* 20000 */
-#define N_HABILIDADES 3      /* 10 */
+#define T_FIM_DO_MUNDO 50000  /* 525600 */
+#define N_TAMANHO_MUNDO 10000 /* 20000 */
+#define N_HABILIDADES 3       /* 10 */
 typedef enum
 {
     CHEGA = 1,
@@ -32,16 +32,16 @@ long aleat(long min, long max)
 
 struct world mundo_inicia()
 {
-    struct world mundo;
+    struct world worldi;
 
-    mundo.clock = T_INICIO;
-    mundo.size_world.x = mundo.size_world.y = N_TAMANHO_MUNDO;
-    mundo.total_skills = N_HABILIDADES;
-    mundo.total_heroes = N_HABILIDADES * 5;
-    mundo.total_bases = mundo.total_heroes / 5;
-    mundo.total_missions = T_FIM_DO_MUNDO / 100;
+    worldi.clock = T_INICIO;
+    worldi.size_world.x = worldi.size_world.y = N_TAMANHO_MUNDO;
+    worldi.total_skills = N_HABILIDADES;
+    worldi.total_heroes = N_HABILIDADES * 5;
+    worldi.total_bases = worldi.total_heroes / 5; /* worldi.total_heroes / 5 */
+    worldi.total_missions = T_FIM_DO_MUNDO / 100;
 
-    return mundo;
+    return worldi;
 }
 
 struct hero *herois_inicia(struct world *my_world)
@@ -56,9 +56,9 @@ struct hero *herois_inicia(struct world *my_world)
         my_world->heroes[i].ID = i;
         my_world->heroes[i].status = 1;
         my_world->heroes[i].experience = 0;
-        my_world->heroes[i].patience = aleat(0, 100);
-        my_world->heroes[i].speed = aleat(1, 10);
-        my_world->heroes[i].skills = cjto_aleat(aleat(1, 2), N_HABILIDADES);
+        my_world->heroes[i].patience = aleat(0, 100);                        /* 0, 100 */
+        my_world->heroes[i].speed = aleat(50, 5000);                         /* 50, 5000 */
+        my_world->heroes[i].skills = cjto_aleat(aleat(1, 2), N_HABILIDADES); /* aleat(1,3) */
     }
 
     return my_world->heroes;
@@ -76,9 +76,11 @@ struct base *bases_inicia(struct world *my_world)
         my_world->bases[i].ID = i;
         my_world->bases[i].locatization.x = aleat(0, N_TAMANHO_MUNDO - 1);
         my_world->bases[i].locatization.y = aleat(0, N_TAMANHO_MUNDO - 1);
-        my_world->bases[i].capacity = aleat(3, 10);
+        my_world->bases[i].capacity = aleat(1, 6); /* 3, 10 */
         my_world->bases[i].present_heroes = cjto_cria(my_world->total_heroes);
         my_world->bases[i].waiting_queue = lista_cria();
+        my_world->bases[i].max_queue = 0;
+        my_world->bases[i].mission_participation = 0;
     }
 
     return my_world->bases;
@@ -98,36 +100,52 @@ struct mission *missoes_inicia(struct world *my_world)
         my_world->missions[i].localization.y = aleat(0, N_TAMANHO_MUNDO - 1);
         my_world->missions[i].skills_needed = cjto_aleat(aleat(1, 3), my_world->total_skills);
         my_world->missions[i].danger = aleat(0, 100);
+        my_world->missions[i].attempts = 0;
     }
 
     return my_world->missions;
 }
 
+struct statistics estatisticas_inicia(struct world *my_world)
+{
+    my_world->infos.events_handled = 0;
+    my_world->infos.max_attempts_mission = 0;
+    my_world->infos.min_attempts_mission = __INT_MAX__;
+    my_world->infos.missions_completed = 0;
+    my_world->infos.total_deaths = 0;
+
+    return my_world->infos;
+}
+
 void heroes_evi(struct fprio_t **lef, struct world *my_world)
 {
     struct event *ev;
-    int i, tempo;
+    int i, time;
 
     for (i = 0; i < my_world->total_heroes; i++)
     {
         my_world->heroes[i].base = aleat(0, my_world->total_bases - 1);
-        tempo = aleat(0, 4320);
-        ev = cria_evento(tempo, CHEGA, my_world->heroes[i].ID, my_world->heroes[i].base, -1);
+        time = aleat(0, 4320);
+        ev = cria_evento(time, CHEGA, my_world->heroes[i].ID, my_world->heroes[i].base, -1);
         fprio_insere(*lef, ev, ev->tipo, ev->tempo);
     }
+
+    return;
 }
 
 void mission_evi(struct fprio_t **lef, struct world *my_world)
 {
     struct event *ev;
-    int i, tempo;
+    int i, time;
 
     for (i = 0; i < my_world->total_missions; i++)
     {
-        tempo = aleat(0, T_FIM_DO_MUNDO);
-        ev = cria_evento(tempo, MISSAO, -1, -1, my_world->missions[i].ID);
+        time = aleat(0, T_FIM_DO_MUNDO);
+        ev = cria_evento(time, MISSAO, -1, -1, my_world->missions[i].ID);
         fprio_insere(*lef, ev, ev->tipo, ev->tempo);
     }
+
+    return;
 }
 
 void end_evi(struct fprio_t **lef)
@@ -136,6 +154,8 @@ void end_evi(struct fprio_t **lef)
 
     ev = cria_evento(T_FIM_DO_MUNDO, FIM, -1, -1, -1);
     fprio_insere(*lef, ev, ev->tipo, ev->tempo);
+
+    return;
 }
 
 void mundo_destroi(struct world *my_world)
@@ -162,4 +182,6 @@ void mundo_destroi(struct world *my_world)
     free(my_world->heroes);
     free(my_world->bases);
     free(my_world->missions);
+
+    return;
 }

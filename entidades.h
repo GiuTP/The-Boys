@@ -33,6 +33,8 @@ struct base
     struct cjto_t *present_heroes; /* conjunto de herois presentes da base */
     struct lista_t *waiting_queue; /* fila de espera da base */
     struct coord locatization;     /* localizacao da base */
+    int max_queue;                 /* fila maxima da base */
+    int mission_participation;     /* Qtd. de missoes participadas */
 };
 
 /* Descreve atributos de uma missao */
@@ -42,6 +44,18 @@ struct mission
     struct cjto_t *skills_needed; /* conjunto de habilidades necessarias */
     int danger;                   /* nivel de perigo da missao */
     struct coord localization;    /* localizacao da missao */
+    int attempts;                 /* qtd. de tentativas da missao */
+};
+
+/* Descreve dados usados quando o fim acaba */
+struct statistics
+{
+    int events_handled;       /* acumulador de eventos tratatos na simulacao */
+    int missions_completed;   /* acumulador de missoes completadas na simulacao */
+    int min_attempts_mission; /* usado para ver tentativa minima nas missoes */
+    int max_attempts_mission; /* usado para ver tentativa maxima nas missoes */
+    double mortality_rate;    /* taxa de mortalidade da simulacao */
+    int total_deaths;         /* total de mortes na simulacao */
 };
 
 /* Descreve atributos de um mundo */
@@ -56,6 +70,7 @@ struct world
     int total_skills;         /* numero de habilidades distintas no mundo */
     struct coord size_world;  /* tamanho do mundo */
     int clock;                /* tempo do mundo */
+    struct statistics infos;  /* estatisticas do mundo */
 };
 
 /* Descreve atributos vinculados a um evento */
@@ -68,20 +83,13 @@ struct event
     int mission_id;
 };
 
+/* Descreve atributos de bases candidatas a bpm nas missoes */
 struct bases_m
 {
     int base_id;
     int dist;
     struct cjto_t *heroes_id;
     struct cjto_t *Union;
-};
-
-struct statistics
-{
-    /* Estatisticas relacionadas as bases */
-    int max_pres_h;       /* Qtd. maxima de herois na base */
-    int max_queue;        /* Qtd. maxima de herois na fila da base */
-    int complete_mission; /* Qtd. de missoes que a base participou */
 };
 
 /* -------------------- Inicializacao do mundo -------------------- */
@@ -100,6 +108,10 @@ struct hero *herois_inicia(struct world *my_world);
 /* Inicializa o vetor de bases do mundo. */
 /* Retorno: ponteiro para struct base ou NULL em caso de erro */
 struct base *bases_inicia(struct world *my_world);
+
+/* Inicializa as estatisticas gerais do mundo */
+/* Retorno: struct statistics */
+struct statistics estatisticas_inicia(struct world *my_world);
 
 /* Inicializa o vetor de missoes do mundo. */
 /* Retorno: ponteiro para struct mission ou NULL em caso de erro. */

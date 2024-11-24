@@ -66,6 +66,16 @@ void evento_viaja(struct fprio_t **lef, struct world *my_world, struct event *ev
 /* Imprime o instante t que o heroi h morre na missao m. */
 void evento_morre(struct fprio_t **lef, struct world *my_world, struct event *ev);
 
+/* Evento o qual missoes iniciam */
+/* O evento verifica para cada base presente no mundo aquela mais proxima que podera cumpri-la. */
+/* Cria um adiciona na LED dois possiveis eventos:
+ * - O heroi morre: adiciona na LEF o evento MORRE;
+ * - A missao eh impossivel: adiciona na LEF a MISSAO 1 dia depois. */
+/* Imprime mensagem de bases analisadas, herois presentes nas bases, a uniao da habilidades. Caso for impossivel, informa. */
 void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *ev);
+
+/* Evento o qual a simulacao acaba. */
+/* Imprime as estatisticas de cada heroi, base e gerais do mundo. */
+void evento_fim(struct world my_world, struct event *ev);
 
 #endif

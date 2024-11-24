@@ -1,5 +1,5 @@
 // programa principal do projeto "The Boys - 2024/2"
-// Autor: xxxxx, GRR xxxxxx
+// Autor: Giuliano Thiago Pinherio Tavares, GRR 20240305
 
 // seus #includes vão aqui
 #include <stdio.h>
@@ -13,7 +13,6 @@
 #include "entidades.h"
 
 // seus #defines vão aqui
-#define T_FIM_DO_MUNDO 8000 /* 525600 */
 typedef enum
 {
     CHEGA = 1,
@@ -38,20 +37,24 @@ int main()
     struct fprio_t *lef;
     int tipo, tempo;
 
+    srand(0);
+
+    /* Inicializa todas as entidades e campos do mundo */
     my_world = mundo_inicia();
     my_world.heroes = herois_inicia(&my_world);
     my_world.bases = bases_inicia(&my_world);
+    my_world.infos = estatisticas_inicia(&my_world);
     my_world.missions = missoes_inicia(&my_world);
 
+    /* Inicializa a LEF */
     lef = fprio_cria();
 
+    /* Cria os eventos iniciais do mundo */
     heroes_evi(&lef, &my_world);
     mission_evi(&lef, &my_world);
     end_evi(&lef);
 
-    /* Semente randômica */
-    srand(0);
-
+    /* Loop principal da simulacao */
     do
     {
         ev = fprio_retira(lef, &tipo, &tempo);
@@ -60,25 +63,32 @@ int main()
         switch (tipo)
         {
         case CHEGA:
-            evento_chega(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_chega(&lef, &my_world, ev);
             break;
         case ESPERA:
-            evento_espera(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_espera(&lef, &my_world, ev);
             break;
         case DESISTE:
-            evento_desiste(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_desiste(&lef, &my_world, ev);
             break;
         case AVISA:
-            evento_avisa(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_avisa(&lef, &my_world, ev);
             break;
         case ENTRA:
-            evento_entra(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_entra(&lef, &my_world, ev);
             break;
         case SAI:
-            evento_sai(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_sai(&lef, &my_world, ev);
             break;
         case VIAJA:
-            evento_viaja(&lef, &my_world, ev);
+            if (my_world.heroes[ev->hero_id].status)
+                evento_viaja(&lef, &my_world, ev);
             break;
         case MORRE:
             evento_morre(&lef, &my_world, ev);
@@ -87,7 +97,7 @@ int main()
             evento_missao(&lef, &my_world, ev);
             break;
         case FIM:
-            printf("Fim do mundo\n");
+            evento_fim(my_world, ev);
             break;
         }
         free(ev);
@@ -95,8 +105,7 @@ int main()
 
     } while (tipo != FIM);
 
-    /* libera a memoria alocada */
-    // destruir o mundo
+    /* Libera toda memoria alocada para a simulacao */
     mundo_destroi(&my_world);
     fprio_destroi(lef);
 
