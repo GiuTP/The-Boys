@@ -45,6 +45,16 @@ int fprio_insere(struct fprio_t *f, void *item, int tipo, int prio)
     if (f == NULL || item == NULL)
         return -1;
 
+    /* Verifica se o item já existe na fila */
+    aux = f->prim;
+    while (aux != NULL)
+    {
+        if ((aux->item == item) && (aux->tipo == tipo) && (aux->prio == prio))
+            return -1;
+
+        aux = aux->prox;
+    }
+
     if (!(novo = malloc(sizeof(struct fpnodo_t))))
         return -1;
 
@@ -53,47 +63,32 @@ int fprio_insere(struct fprio_t *f, void *item, int tipo, int prio)
     novo->tipo = tipo;
     novo->prio = prio;
 
-    /* Verifica se o item já existe na fila */
-    aux = f->prim;
-    while (aux != NULL)
-    {
-        if ((aux->item == item) && (aux->tipo == tipo) && (aux->prio == prio))
-        {
-            free(novo);
-            return -1;
-        }
-
-        aux = aux->prox;
-    }
-
     /* Insere em fila vazia */
     if (f->num == 0)
     {
         f->prim = novo;
         novo->prox = NULL;
-        f->num++;
-
-        return f->num;
     }
-
-    aux = f->prim;
-
-    /* Caso onde a prioridade do novo nodo é maior que o primeiro nodo da fila */
-    if (prio < aux->prio)
+    else
     {
-        novo->prox = aux;
-        f->prim = novo;
-        f->num++;
+        aux = f->prim;
 
-        return f->num;
+        /* Caso onde a prioridade do novo nodo é maior que o primeiro nodo da fila */
+        if (prio < aux->prio)
+        {
+            novo->prox = aux;
+            f->prim = novo;
+        }
+        else
+        {
+            /* Caso geral, tenta inserir pelo meio */
+            while (aux->prox != NULL && prio >= aux->prox->prio)
+                aux = aux->prox;
+
+            novo->prox = aux->prox;
+            aux->prox = novo;
+        }
     }
-
-    /* Caso geral, tenta inserir pelo meio */
-    while (aux->prox != NULL && prio >= aux->prox->prio)
-        aux = aux->prox;
-
-    novo->prox = aux->prox;
-    aux->prox = novo;
     f->num++;
 
     return f->num;

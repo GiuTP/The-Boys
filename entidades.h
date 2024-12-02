@@ -2,20 +2,20 @@
 #define ENTIDADES
 
 #include "conjunto.h"
-#include "lista.h"
+#include "fila.h"
 
 /* -------------------- Entidades do mundo -------------------- */
 
 /* Descreve atributos de um heroi */
 struct hero
 {
-    int ID;                /* identicador do heroi */
-    int status;            /* status do heroi */
-    struct cjto_t *skills; /* conjunto de habilidades */
-    int patience;          /* paciencia do heroi */
-    int speed;             /* velocidade do heroi */
-    int experience;        /* experiencia do heroi */
-    int base;              /* base onde o heroi esta */
+    int ID;                     /* identicador do heroi */
+    int status;                 /* status do heroi */
+    struct cjto_t *habilidades; /* conjunto de habilidades */
+    int paciência;              /* paciencia do heroi */
+    int velocidade;             /* velocidade do heroi */
+    int xp;                     /* experiencia do heroi */
+    int base;                   /* base onde o heroi esta */
 };
 
 /* Coordenada das bases */
@@ -28,68 +28,67 @@ struct coord
 /* Descreve atributos de uma base */
 struct base
 {
-    int ID;                        /* identicador da base */
-    int capacity;                  /* capacidade da base */
-    struct cjto_t *present_heroes; /* conjunto de herois presentes da base */
-    struct lista_t *waiting_queue; /* fila de espera da base */
-    struct coord locatization;     /* localizacao da base */
-    int max_queue;                 /* fila maxima da base */
-    int mission_participation;     /* Qtd. de missoes participadas */
+    int ID;                     /* identicador da base */
+    int lotação;                /* capacidade da base */
+    struct cjto_t *h_presentes; /* conjunto de herois presentes da base */
+    struct fila_t *f_espera;    /* fila de espera da base */
+    struct coord local;         /* localizacao da base */
+    int f_max;                  /* fila maxima usada nas estatisticas*/
+    int part_missão;            /* Qtd. de missoes participadas */
 };
 
 /* Descreve atributos de uma missao */
 struct mission
 {
-    int ID;                       /* identicador da missao */
-    struct cjto_t *skills_needed; /* conjunto de habilidades necessarias */
-    int danger;                   /* nivel de perigo da missao */
-    struct coord localization;    /* localizacao da missao */
-    int attempts;                 /* qtd. de tentativas da missao */
+    int ID;                         /* identicador da missao */
+    struct cjto_t *hab_necessarias; /* conjunto de habilidades necessarias */
+    int perigo;                     /* nivel de perigo da missao */
+    struct coord local;             /* localizacao da missao */
+    int tent;                       /* qtd. de tentativas da missao */
 };
 
 /* Descreve dados usados quando o fim acaba */
 struct statistics
 {
-    int events_handled;       /* acumulador de eventos tratatos na simulacao */
-    int missions_completed;   /* acumulador de missoes completadas na simulacao */
-    int min_attempts_mission; /* usado para ver tentativa minima nas missoes */
-    int max_attempts_mission; /* usado para ver tentativa maxima nas missoes */
-    double mortality_rate;    /* taxa de mortalidade da simulacao */
-    int total_deaths;         /* total de mortes na simulacao */
+    int ev_tratados;     /* acumulador de eventos tratatos na simulacao */
+    int comp_missões;    /* acumulador de missoes completadas na simulacao */
+    int tent_min_missão; /* usado para ver tentativa minima nas missoes */
+    int tent_max_missão; /* usado para ver tentativa maxima nas missoes */
+    int total_mortes;    /* total de mortes na simulacao */
 };
 
 /* Descreve atributos de um mundo */
 struct world
 {
-    int total_heroes;         /* numero de herois no mundo */
-    struct hero *heroes;      /* vetor de herois */
-    int total_bases;          /* numero de bases no mundo */
-    struct base *bases;       /* vetor de bases */
-    int total_missions;       /* numero de missoes no mundo */
-    struct mission *missions; /* vetor de missoes */
-    int total_skills;         /* numero de habilidades distintas no mundo */
-    struct coord size_world;  /* tamanho do mundo */
-    int clock;                /* tempo do mundo */
-    struct statistics infos;  /* estatisticas do mundo */
+    int num_herois;          /* numero de herois no mundo */
+    struct hero *herois;     /* vetor de herois */
+    int num_bases;           /* numero de bases no mundo */
+    struct base *bases;      /* vetor de bases */
+    int num_missões;         /* numero de missoes no mundo */
+    struct mission *missões; /* vetor de missoes */
+    int num_habilidades;     /* numero de habilidades distintas no mundo */
+    struct coord tam_mundo;  /* tamanho do mundo */
+    int clock;               /* tempo do mundo */
+    struct statistics infos; /* estatisticas do mundo */
 };
 
 /* Descreve atributos vinculados a um evento */
 struct event
 {
-    int tipo;
-    int tempo;
-    int hero_id;
-    int base_id;
-    int mission_id;
+    int tipo;  /* tipo do evento */
+    int tempo; /* hora que o evento ocorrera */
+    int h_id;  /* heroi vinculado ao evento */
+    int b_id;  /* base vinculada ao evento */
+    int m_id;  /* missao vinculada ao evento */
 };
 
 /* Descreve atributos de bases candidatas a bpm nas missoes */
 struct bases_m
 {
-    int base_id;
+    int b_id;
     int dist;
-    struct cjto_t *heroes_id;
-    struct cjto_t *Union;
+    struct cjto_t *h_id;
+    struct cjto_t *União;
 };
 
 /* -------------------- Inicializacao do mundo -------------------- */

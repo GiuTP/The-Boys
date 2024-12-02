@@ -7,9 +7,9 @@
 
 // seus #defines vão aqui
 #define T_INICIO 0
-#define T_FIM_DO_MUNDO 50000  /* 525600 */
-#define N_TAMANHO_MUNDO 10000 /* 20000 */
-#define N_HABILIDADES 3       /* 10 */
+#define T_FIM_DO_MUNDO 525600 /* 525600 */
+#define N_TAMANHO_MUNDO 20000 /* 20000 */
+#define N_HABILIDADES 10      /* 10 */
 typedef enum
 {
     CHEGA = 1,
@@ -34,11 +34,11 @@ struct world mundo_inicia()
     struct world worldi;
 
     worldi.clock = T_INICIO;
-    worldi.size_world.x = worldi.size_world.y = N_TAMANHO_MUNDO;
-    worldi.total_skills = N_HABILIDADES;
-    worldi.total_heroes = N_HABILIDADES * 5;
-    worldi.total_bases = worldi.total_heroes / 5; /* worldi.total_heroes / 5 */
-    worldi.total_missions = T_FIM_DO_MUNDO / 100;
+    worldi.tam_mundo.x = worldi.tam_mundo.y = N_TAMANHO_MUNDO;
+    worldi.num_habilidades = N_HABILIDADES;
+    worldi.num_herois = N_HABILIDADES * 5;
+    worldi.num_bases = worldi.num_herois / 5; /* worldi.total_heroes / 5 */
+    worldi.num_missões = T_FIM_DO_MUNDO / 100;
 
     return worldi;
 }
@@ -47,39 +47,39 @@ struct hero *herois_inicia(struct world *my_world)
 {
     int i;
 
-    if (!(my_world->heroes = malloc(my_world->total_heroes * sizeof(struct hero))))
+    if (!(my_world->herois = malloc(my_world->num_herois * sizeof(struct hero))))
         return NULL;
 
-    for (i = 0; i < my_world->total_heroes; i++)
+    for (i = 0; i < my_world->num_herois; i++)
     {
-        my_world->heroes[i].ID = i;
-        my_world->heroes[i].status = 1;
-        my_world->heroes[i].experience = 0;
-        my_world->heroes[i].patience = aleat(0, 100);                        /* 0, 100 */
-        my_world->heroes[i].speed = aleat(50, 5000);                         /* 50, 5000 */
-        my_world->heroes[i].skills = cjto_aleat(aleat(1, 2), N_HABILIDADES); /* aleat(1,3) */
+        my_world->herois[i].ID = i;
+        my_world->herois[i].status = 1;
+        my_world->herois[i].xp = 0;
+        my_world->herois[i].paciência = aleat(0, 100);                            /* 0, 100 */
+        my_world->herois[i].velocidade = aleat(50, 5000);                         /* 50, 5000 */
+        my_world->herois[i].habilidades = cjto_aleat(aleat(1, 3), N_HABILIDADES); /* aleat(1,3) */
     }
 
-    return my_world->heroes;
+    return my_world->herois;
 }
 
 struct base *bases_inicia(struct world *my_world)
 {
     int i;
 
-    if (!(my_world->bases = malloc(my_world->total_bases * sizeof(struct base))))
+    if (!(my_world->bases = malloc(my_world->num_bases * sizeof(struct base))))
         return NULL;
 
-    for (i = 0; i < my_world->total_bases; i++)
+    for (i = 0; i < my_world->num_bases; i++)
     {
         my_world->bases[i].ID = i;
-        my_world->bases[i].locatization.x = aleat(0, N_TAMANHO_MUNDO - 1);
-        my_world->bases[i].locatization.y = aleat(0, N_TAMANHO_MUNDO - 1);
-        my_world->bases[i].capacity = aleat(1, 6); /* 3, 10 */
-        my_world->bases[i].present_heroes = cjto_cria(my_world->total_heroes);
-        my_world->bases[i].waiting_queue = lista_cria();
-        my_world->bases[i].max_queue = 0;
-        my_world->bases[i].mission_participation = 0;
+        my_world->bases[i].local.x = aleat(0, N_TAMANHO_MUNDO - 1);
+        my_world->bases[i].local.y = aleat(0, N_TAMANHO_MUNDO - 1);
+        my_world->bases[i].lotação = aleat(3, 10); /* 3, 10 */
+        my_world->bases[i].h_presentes = cjto_cria(my_world->num_herois);
+        my_world->bases[i].f_espera = fila_cria();
+        my_world->bases[i].f_max = 0;
+        my_world->bases[i].part_missão = 0;
     }
 
     return my_world->bases;
@@ -89,29 +89,29 @@ struct mission *missoes_inicia(struct world *my_world)
 {
     int i;
 
-    if (!(my_world->missions = malloc(my_world->total_missions * sizeof(struct mission))))
+    if (!(my_world->missões = malloc(my_world->num_missões * sizeof(struct mission))))
         return NULL;
 
-    for (i = 0; i < my_world->total_missions; i++)
+    for (i = 0; i < my_world->num_missões; i++)
     {
-        my_world->missions[i].ID = i;
-        my_world->missions[i].localization.x = aleat(0, N_TAMANHO_MUNDO - 1);
-        my_world->missions[i].localization.y = aleat(0, N_TAMANHO_MUNDO - 1);
-        my_world->missions[i].skills_needed = cjto_aleat(aleat(1, 3), my_world->total_skills);
-        my_world->missions[i].danger = aleat(0, 100);
-        my_world->missions[i].attempts = 0;
+        my_world->missões[i].ID = i;
+        my_world->missões[i].local.x = aleat(0, N_TAMANHO_MUNDO - 1);
+        my_world->missões[i].local.y = aleat(0, N_TAMANHO_MUNDO - 1);
+        my_world->missões[i].hab_necessarias = cjto_aleat(aleat(6, 10), my_world->num_habilidades);
+        my_world->missões[i].perigo = aleat(0, 100);
+        my_world->missões[i].tent = 1;
     }
 
-    return my_world->missions;
+    return my_world->missões;
 }
 
 struct statistics estatisticas_inicia(struct world *my_world)
 {
-    my_world->infos.events_handled = 0;
-    my_world->infos.max_attempts_mission = 0;
-    my_world->infos.min_attempts_mission = __INT_MAX__;
-    my_world->infos.missions_completed = 0;
-    my_world->infos.total_deaths = 0;
+    my_world->infos.ev_tratados = 0;
+    my_world->infos.tent_max_missão = 0;
+    my_world->infos.tent_min_missão = __INT_MAX__;
+    my_world->infos.comp_missões = 0;
+    my_world->infos.total_mortes = 0;
 
     return my_world->infos;
 }
@@ -121,11 +121,11 @@ void heroes_evi(struct fprio_t **lef, struct world *my_world)
     struct event *ev;
     int i, time;
 
-    for (i = 0; i < my_world->total_heroes; i++)
+    for (i = 0; i < my_world->num_herois; i++)
     {
-        my_world->heroes[i].base = aleat(0, my_world->total_bases - 1);
-        time = aleat(0, 4320);
-        ev = cria_evento(time, CHEGA, my_world->heroes[i].ID, my_world->heroes[i].base, -1);
+        my_world->herois[i].base = aleat(0, my_world->num_bases - 1);
+        time = aleat(0, 60 * 24 * 3);
+        ev = cria_evento(time, CHEGA, my_world->herois[i].ID, my_world->herois[i].base, -1);
         fprio_insere(*lef, ev, ev->tipo, ev->tempo);
     }
 
@@ -137,10 +137,10 @@ void mission_evi(struct fprio_t **lef, struct world *my_world)
     struct event *ev;
     int i, time;
 
-    for (i = 0; i < my_world->total_missions; i++)
+    for (i = 0; i < my_world->num_missões; i++)
     {
         time = aleat(0, T_FIM_DO_MUNDO);
-        ev = cria_evento(time, MISSAO, -1, -1, my_world->missions[i].ID);
+        ev = cria_evento(time, MISSAO, -1, -1, my_world->missões[i].ID);
         fprio_insere(*lef, ev, ev->tipo, ev->tempo);
     }
 
@@ -162,25 +162,25 @@ void mundo_destroi(struct world *my_world)
     int i;
 
     /* Desaloca a memoria alocada para o conjunto de habilidades de cada heroi */
-    for (i = 0; i < my_world->total_heroes; i++)
-        cjto_destroi(my_world->heroes[i].skills);
+    for (i = 0; i < my_world->num_herois; i++)
+        cjto_destroi(my_world->herois[i].habilidades);
 
     /* Desaloca a memoria alocada para cada base nos casos:
      * - Conjunto de herois presentes na base
      * - Fila de espera da base */
-    for (i = 0; i < my_world->total_bases; i++)
+    for (i = 0; i < my_world->num_bases; i++)
     {
-        cjto_destroi(my_world->bases[i].present_heroes);
-        lista_destroi(my_world->bases[i].waiting_queue);
+        cjto_destroi(my_world->bases[i].h_presentes);
+        fila_destroi(my_world->bases[i].f_espera);
     }
 
     /* Desaloca a memoria alocada para o conjunto de habilidades necessarias de cada missao */
-    for (i = 0; i < my_world->total_missions; i++)
-        cjto_destroi(my_world->missions[i].skills_needed);
+    for (i = 0; i < my_world->num_missões; i++)
+        cjto_destroi(my_world->missões[i].hab_necessarias);
 
-    free(my_world->heroes);
+    free(my_world->herois);
     free(my_world->bases);
-    free(my_world->missions);
+    free(my_world->missões);
 
     return;
 }

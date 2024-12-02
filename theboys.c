@@ -6,6 +6,7 @@
 #include "fprio.h"
 #include "eventos.h"
 #include "entidades.h"
+#include <time.h>
 
 // seus #defines vão aqui
 typedef enum
@@ -36,10 +37,10 @@ int main()
 
     /* Inicializa todas as entidades e campos do mundo */
     my_world = mundo_inicia();
-    my_world.heroes = herois_inicia(&my_world);
+    my_world.herois = herois_inicia(&my_world);
     my_world.bases = bases_inicia(&my_world);
     my_world.infos = estatisticas_inicia(&my_world);
-    my_world.missions = missoes_inicia(&my_world);
+    my_world.missões = missoes_inicia(&my_world);
 
     /* Inicializa a LEF */
     lef = fprio_cria();
@@ -58,31 +59,31 @@ int main()
         switch (tipo)
         {
         case CHEGA:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_chega(&lef, &my_world, ev);
             break;
         case ESPERA:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_espera(&lef, &my_world, ev);
             break;
         case DESISTE:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_desiste(&lef, &my_world, ev);
             break;
         case AVISA:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_avisa(&lef, &my_world, ev);
             break;
         case ENTRA:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_entra(&lef, &my_world, ev);
             break;
         case SAI:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_sai(&lef, &my_world, ev);
             break;
         case VIAJA:
-            if (my_world.heroes[ev->hero_id].status)
+            if (my_world.herois[ev->h_id].status)
                 evento_viaja(&lef, &my_world, ev);
             break;
         case MORRE:
