@@ -1,14 +1,12 @@
 // programa principal do projeto "The Boys - 2024/2"
 // Autor: Giuliano Thiago Pinherio Tavares, GRR 20240305
 
-// seus #includes vão aqui
 #include <stdlib.h>
 #include "fprio.h"
 #include "eventos.h"
 #include "entidades.h"
 #include <time.h>
 
-// seus #defines vão aqui
 typedef enum
 {
     CHEGA = 1,
@@ -23,9 +21,7 @@ typedef enum
     FIM
 } EventType;
 
-// minimize o uso de variáveis globais
-
-// programa principal
+/* programa principal */
 int main()
 {
     struct world my_world;

@@ -43,7 +43,7 @@ int dist_pts(struct coord p1, struct coord p2)
 {
     return (sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)));
 }
-/* 184.416 */
+
 /* Troca o indice a com o indice b de um vetor de bases_m */
 void swap(struct bases_m *a, struct bases_m *b)
 {
@@ -78,7 +78,7 @@ int partition(struct bases_m *bC, int low, int high)
     return i + 1;
 }
 
-/* Algoritmo de ordenacao quick sort recursivo */
+/* Algoritmo de ordenacao quick sort recursivo para o vetor de bases_m */
 void quick_sort(struct bases_m *bC, int low, int high)
 {
     int pivot;
@@ -99,40 +99,38 @@ void evento_chega(struct fprio_t **lef, struct world *my_world, struct event *ev
     struct event *new_ev;
     int espera;
 
-    /* Recupera heroi e base vinculados ao evento */
+    /* Recupera heroi e base vinculados ao evento. */
+    /* Se repete para todos os eventos, mudando apenas o que esta sendo recuperado. */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
+    /* Incrementa contador de eventos. */
+    /* Se repete em todos os eventos tambem. */
     my_world->infos.ev_tratados++;
 
-    /* Atualiza base do heroi */
+    /* Atualiza a base do heroi */
     h->base = b->ID;
 
-    /* Verifica se o heroi esperara ou nao na fila de espera da base */
     if ((b->h_presentes->num < b->lotação) && (b->f_espera->prim == NULL))
         espera = 1;
     else
         espera = (h->paciência) > (10 * fila_tamanho(b->f_espera));
 
-    /* Adicionando evento novo na LEF */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     if (espera)
     {
-        /* Adicionando evento */
+        /* Criando evento e adicionando na LEF. */
         new_ev = cria_evento(ev->tempo, ESPERA, h->ID, b->ID, -1);
         fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-        /* Imprimir mensagem */
         printf("%6d: CHEGA  HEROI %2d BASE %d (%2d/%2d) ESPERA\n",
                ev->tempo, ev->h_id, ev->b_id, b->h_presentes->num, b->lotação);
     }
     else
     {
-        /* Adicionando evento */
         new_ev = cria_evento(ev->tempo, DESISTE, h->ID, b->ID, -1);
         fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-        /* Imprimir mensagem */
         printf("%6d: CHEGA  HEROI %2d BASE %d (%2d/%2d) DESISTE\n",
                ev->tempo, ev->h_id, ev->b_id, cjto_card(b->h_presentes), b->lotação);
     }
@@ -145,26 +143,23 @@ void evento_espera(struct fprio_t **lef, struct world *my_world, struct event *e
     struct event *new_ev;
     int q_tam;
 
-    /* Recupera heroi e base vinculados ao evento */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
-    /* Insere heroi na fila de espera da base */
+    /* Insere heroi na fila de espera da base. */
     enqueue(b->f_espera, ev->h_id, -1);
 
-    /* Usado para estatisticas. Verifica se o tamanho da fila atual eh maior que o maior tamanho ate entao */
+    /* Usado para atualizar o f_max (maior tamanho da fila). */
     q_tam = fila_tamanho(b->f_espera);
     if (q_tam > b->f_max)
         b->f_max = q_tam;
 
-    /* Adicionando evento */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     new_ev = cria_evento(ev->tempo, AVISA, h->ID, b->ID, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: ESPERA HEROI %2d BASE %d (%2d)\n",
            ev->tempo, h->ID, b->ID, q_tam - 1);
 }
@@ -176,21 +171,18 @@ void evento_desiste(struct fprio_t **lef, struct world *my_world, struct event *
     struct event *new_ev;
     int new_base;
 
-    /* Recupera heroi e base vinculados ao evento */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
-    /* Sorteito da nova base para o heroi ir */
+    /* Sorteio da nova base para o heroi ir. */
     new_base = aleat(0, my_world->num_bases - 1);
 
-    /* Adicionando evento */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     new_ev = cria_evento(ev->tempo, VIAJA, h->ID, new_base, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: DESIST HEROI %2d BASE %d\n",
            ev->tempo, h->ID, b->ID);
 }
@@ -201,30 +193,26 @@ void evento_avisa(struct fprio_t **lef, struct world *my_world, struct event *ev
     struct base *b;
     struct event *new_ev;
 
-    /* Recupera base vinculada ao evento */
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
-    /* Imprimir quantos heroi estao na fila */
+    /* Mostra quantos herois estao na fila de espera. */
     printf("%6d: AVISA  PORTEIRO BASE %d (%2d/%2d) FILA [ ",
            ev->tempo, ev->b_id, b->h_presentes->num, b->lotação);
     fila_imprime(b->f_espera);
     printf(" ]\n");
 
-    /* Adicionando herois na base enquanto houver gente na fila e a base nao estiver cheia */
+    /* Começar a inserir herois na base enquanto for possivel. */
     while ((b->h_presentes->num < b->lotação) && (b->f_espera->prim != NULL))
     {
-        /* Retira heroi da fila e insere na base */
         dequeue(b->f_espera, &h, 0);
         cjto_insere(b->h_presentes, h);
 
-        /* Adicionando evento */
+        /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
         new_ev = cria_evento(ev->tempo, ENTRA, h, b->ID, -1);
         fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-        /* Imprimir mensagem */
         printf("%6d: AVISA  PORTEIRO BASE %d ADMITE %2d\n", ev->tempo, ev->b_id, h);
     }
 }
@@ -236,21 +224,18 @@ void evento_entra(struct fprio_t **lef, struct world *my_world, struct event *ev
     struct event *new_ev;
     int tpb;
 
-    /* Recupera heroi e base vinculados ao evento */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
     /* Calculo na permanencia do heroi na base */
     tpb = 15 + h->paciência * aleat(1, 20);
 
-    /* Adicionando evento */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     new_ev = cria_evento(ev->tempo + tpb, SAI, h->ID, b->ID, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: ENTRA  HEROI %2d BASE %d (%2d/%2d) SAI %d\n",
            ev->tempo, h->ID, b->ID, b->h_presentes->num, b->lotação, new_ev->tempo);
 }
@@ -262,26 +247,25 @@ void evento_sai(struct fprio_t **lef, struct world *my_world, struct event *ev)
     struct event *new_ev;
     int new_base;
 
-    /* Recupera heroi e base vinculados ao evento */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
-    /* Retira heroi da base e sorteia base para ir */
+    /* Retira heroi da base e sorteia nova base para ele ir */
     cjto_retira(b->h_presentes, h->ID);
     new_base = aleat(0, my_world->num_bases - 1);
 
-    /* Adicionando evento */
+    /* Cria e adiciona eventos na LEF e imprime mensagem do evento:
+     * - Primeiro o evento VIAJA;
+     * - Depois o evento AVISA;
+     * - Mensagem padrao de evento SAI.                             */
     new_ev = cria_evento(ev->tempo, VIAJA, h->ID, new_base, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Adicionando evento */
     new_ev = cria_evento(ev->tempo, AVISA, h->ID, b->ID, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: SAI    HEROI %2d BASE %d (%2d/%2d)\n",
            ev->tempo, h->ID, b->ID, b->h_presentes->num, b->lotação);
 }
@@ -293,23 +277,20 @@ void evento_viaja(struct fprio_t **lef, struct world *my_world, struct event *ev
     struct event *new_ev;
     int dist, tempo;
 
-    /* Recupera heroi e bases vinculados ao evento */
     h = &my_world->herois[ev->h_id];
-    b_current = &my_world->bases[h->base];
-    b_next = &my_world->bases[ev->b_id];
+    b_current = &my_world->bases[h->base]; /* base atual */
+    b_next = &my_world->bases[ev->b_id];   /* base de destino */
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
-    /* Calculo da distância e tempo de viajem */
+    /* Calculo da distância e tempo de viagem. */
     dist = dist_pts(b_current->local, b_next->local);
     tempo = dist / h->velocidade;
 
-    /* Adicionando evento */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     new_ev = cria_evento(ev->tempo + tempo, CHEGA, h->ID, b_next->ID, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: VIAJA  HEROI %2d BASE %d BASE %d DIST %d VEL %d CHEGA %d\n",
            ev->tempo, h->ID, b_current->ID, b_next->ID, dist, h->velocidade, new_ev->tempo);
 }
@@ -321,24 +302,22 @@ void evento_morre(struct fprio_t **lef, struct world *my_world, struct event *ev
     struct mission *m;
     struct event *new_ev;
 
-    /* Recupera heroi, base e missao vinculados ao evento */
     h = &my_world->herois[ev->h_id];
     b = &my_world->bases[ev->b_id];
     m = &my_world->missões[ev->m_id];
 
-    /* Incrementa contador de eventos e mortes */
+    /* Atualiza o contador de eventos e mortes. */
     my_world->infos.ev_tratados++;
     my_world->infos.total_mortes++;
 
-    /* Retira heroi da base pois esta morto e atualiza o status dele */
+    /* Retira heroi da base pois morreu e atualiza o status dele */
     cjto_retira(b->h_presentes, h->ID);
     h->status = 0; /* Status de morto */
 
-    /* Adicionando evento */
+    /* Cria e adiciona evento na LEF e imprime mensagem do evento. */
     new_ev = cria_evento(ev->tempo, AVISA, h->ID, b->ID, -1);
     fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-    /* Imprimir mensagem */
     printf("%6d: MORRE  HEROI %2d MISSAO %d\n", ev->tempo, h->ID, m->ID);
 }
 
@@ -352,16 +331,16 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
     struct event *new_ev;
     int i, j, bmp, risk;
 
-    /* Vetor auxiliar para armazenar as bases candidatas */
+    /* Vetor auxiliar para armazenar as bases candidatas a missao. */
     if (!(bCand = malloc(my_world->num_bases * sizeof(struct bases_m))))
         return;
 
     /* Recupera missao vinculada ao evento */
     m = &my_world->missões[ev->m_id];
 
-    /* Incrementa contador de eventos */
     my_world->infos.ev_tratados++;
 
+    /* Verifica se tentativa da missao eh maior que o maximo atual */
     if (m->tent > my_world->infos.tent_max_missão)
         my_world->infos.tent_max_missão = m->tent;
 
@@ -370,6 +349,7 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
     cjto_imprime(m->hab_necessarias);
     printf(" ]\n");
 
+    /* --------- Primeira parte - inserir no vetor auxiliar todas as bases do mundo --------- */
     /* Insere no vetor bCand todas as bases do mundo */
     for (i = 0; i < my_world->num_bases; i++)
     {
@@ -393,17 +373,19 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
         bCand[i].União = cjto_copia(union_skills);
         cjto_destroi(union_skills);
     }
+    /* --------- Primeira parte - inserir no vetor auxiliar todas as bases do mundo --------- */
 
     /* Ordena em ordem crescente de distancia as bases */
     quick_sort(bCand, 0, my_world->num_bases - 1);
 
+    /* --------- Segunda parte - escolher a base apta mais proxima --------- */
     /* Começa supondo que nao existe base para a missao */
     bmp = -1;
     for (i = 0; i < my_world->num_bases; i++)
     {
         b = &my_world->bases[bCand[i].b_id];
 
-        /* Imprime mensagem da base i analisada */
+        /* Imprime informacoes da base i analisada */
         printf("%6d: MISSAO %d BASE %d DIST %d HEROIS [ ", ev->tempo, m->ID, b->ID, bCand[i].dist);
         cjto_imprime(b->h_presentes);
         printf(" ]\n");
@@ -424,17 +406,20 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
         cjto_imprime(bCand[i].União);
         printf(" ]\n");
 
-        /* O bpm sera atribuido a base mais proxima e que contem os herois necessarios */
+        /* O bpm sera atribuido a base mais proxima e que contem os herois necessarios apenas uma vez */
         if ((cjto_contem(bCand[i].União, m->hab_necessarias)) && (bmp == -1) && (cjto_card(bCand[i].União) != 0))
             bmp = i;
     }
+    /* --------- Segunda parte - escolher a base apta mais proxima --------- */
 
+    /* --------- Terceira parte - verificar se a missao foi cumprida --------- */
     /* Verifica se foi encontrado alguma base para a missao */
     if (bmp != -1)
     {
+        /* Recupera a base apta para a missao */
         b = &my_world->bases[bCand[bmp].b_id];
 
-        /* Incrementa o contador de missoes que a base participou e o numero de missoes completas do mundo */
+        /* Incrementa a qtd. de missoes cumpridas e o a qtd que a base b participou de missoes */
         b->part_missão++;
         my_world->infos.comp_missões++;
 
@@ -471,14 +456,15 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
         /* Incrementa o numero de tentativas da missao m */
         m->tent++;
 
-        /* Adia a missao para o proximo dia e insere na LEF */
+        /* Adia a missao para o proximo dia e insere na LEF e imprime mensagem */
         new_ev = cria_evento(ev->tempo + 24 * 60, MISSAO, -1, -1, ev->m_id);
         fprio_insere(*lef, new_ev, new_ev->tipo, new_ev->tempo);
 
-        /* Imprime mensagem */
         printf("%6d: MISSAO %d IMPOSSIVEL\n", ev->tempo, ev->m_id);
     }
+    /* --------- Terceira parte - verificar se a missao foi cumprida --------- */
 
+    /* --------- Quarta parte - limpar memoria --------- */
     /* Libera toda a memoria alocada para bCand */
     for (i = 0; i < my_world->num_bases; i++)
     {
@@ -486,6 +472,7 @@ void evento_missao(struct fprio_t **lef, struct world *my_world, struct event *e
         cjto_destroi(bCand[i].União);
     }
     free(bCand);
+    /* --------- Quarta parte - limpar memoria --------- */
 }
 
 void evento_fim(struct world my_world, struct event *ev)
@@ -494,7 +481,6 @@ void evento_fim(struct world my_world, struct event *ev)
     struct base b;
     int i, sum_attempts;
 
-    /* Incrementa contador de eventos */
     my_world.infos.ev_tratados++;
 
     printf("%6d: FIM\n", ev->tempo);

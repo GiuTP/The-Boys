@@ -47,7 +47,7 @@ struct mission
     int tent;                       /* qtd. de tentativas da missao */
 };
 
-/* Descreve dados usados quando o fim acaba */
+/* Descreve dados usados quando o mundo acaba */
 struct statistics
 {
     int ev_tratados;     /* acumulador de eventos tratatos na simulacao */
@@ -85,10 +85,10 @@ struct event
 /* Descreve atributos de bases candidatas a bpm nas missoes */
 struct bases_m
 {
-    int b_id;
-    int dist;
-    struct cjto_t *h_id;
-    struct cjto_t *União;
+    int b_id;             /* ID da base candidata */
+    int dist;             /* distancia da base a missao */
+    struct cjto_t *h_id;  /* conjunto de herois presentes na base */
+    struct cjto_t *União; /* uniao das habilidades dos herois presentes na base */
 };
 
 /* -------------------- Inicializacao do mundo -------------------- */

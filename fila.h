@@ -33,6 +33,15 @@ int enqueue(struct fila_t *fl, int item, int pos);
 // Retorno: número de itens na fila após a operação ou -1 em erro.
 int dequeue(struct fila_t *fl, int *item, int pos);
 
+// Informa o valor do item na posição indicada, sem retirá-lo.
+// se a posição for -1, consulta do fim.
+// Retorno: número de itens na fila ou -1 em erro.
+int fila_consulta(struct fila_t *fl, int *item, int pos);
+
+// Informa a posição da 1ª ocorrência do valor indicado na fila.
+// Retorno: posição do valor ou -1 se não encontrar ou erro.
+int fila_procura(struct fila_t *fl, int valor);
+
 // Informa o tamanho da fila (o número de itens presentes nela).
 // Retorno: número de itens na fila ou -1 em erro.
 int fila_tamanho(struct fila_t *fl);

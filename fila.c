@@ -97,6 +97,55 @@ int dequeue(struct fila_t *fl, int *item, int pos)
     return fl->tamanho;
 }
 
+int lista_consulta(struct fila_t *fl, int *item, int pos)
+{
+    struct item_t *aux;
+    int i;
+
+    /* Casos de fila nula ou posição inválida para consulta */
+    if (fl == NULL || pos < -1 || pos >= fl->tamanho)
+        return -1;
+
+    /* Consulta na última posição da fila */
+    if (pos == -1)
+    {
+        *item = fl->ult->valor;
+
+        return fl->tamanho;
+    }
+
+    /* Consulta em uma posição qualquer da fila */
+    aux = fl->prim;
+    for (i = 0; i < pos; i++)
+        aux = aux->prox;
+
+    *item = aux->valor;
+
+    return fl->tamanho;
+}
+
+int lista_procura(struct fila_t *fl, int valor)
+{
+    struct item_t *aux;
+    int pos;
+
+    /* Caso de fila nula */
+    if (fl == NULL)
+        return -1;
+
+    /* Loop acaba por dois motivos:
+     * Ou o valor desejado foi encontrado;
+     * Ou o pos chegou até o fim e não achou o valor. */
+    aux = fl->prim;
+    for (pos = 0; pos < fl->tamanho && aux->valor != valor; pos++)
+        aux = aux->prox;
+
+    if (pos == fl->tamanho)
+        return -1;
+
+    return pos;
+}
+
 int fila_tamanho(struct fila_t *fl)
 {
     if (fl == NULL)
