@@ -1,0 +1,7 @@
+bin/
+*.tgz
+
+build/*.o
+!build/conjunto.o
+
+compile_commands.json
